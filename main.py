@@ -4,15 +4,21 @@ Shows basic usage of the Sheets API. Prints values from a Google Spreadsheet.
 from __future__ import print_function
 from apiclient.discovery import build
 
+# TODO: creds command which does OAuth and spits out credentials
+# TODO: update command which reads from azure and writes to sheet
+
 from google_auth_oauthlib.flow import InstalledAppFlow
 
-SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
+SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 CLIENT_SECRETS = 'creds.json'
 
 flow = InstalledAppFlow.from_client_secrets_file(
-    CLIENT_SECRETS, scopes=SCOPES)
+    CLIENT_SECRETS, scopes=SCOPES
+)
 
 creds = flow.run_console()
+
+print(vars(creds))
 
 service = build('sheets', 'v4', credentials=creds)
 
