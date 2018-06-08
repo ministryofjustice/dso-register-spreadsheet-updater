@@ -1,37 +1,48 @@
 """
 Shows basic usage of the Sheets API. Prints values from a Google Spreadsheet.
 """
-from __future__ import print_function
+import json
+import os
+
 from apiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.oauth2.credentials import Credentials
 
 # TODO: creds command which does OAuth and spits out credentials
 # TODO: update command which reads from azure and writes to sheet
 
-from google_auth_oauthlib.flow import InstalledAppFlow
 
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 CLIENT_SECRETS = 'creds.json'
+SPREADSHEET_ID= '1rBtFtvJELDrPtkLyOPnYEaWuOzbB0BJDrpEcLTnPeQk'
 
-flow = InstalledAppFlow.from_client_secrets_file(
-    CLIENT_SECRETS, scopes=SCOPES
-)
-
-creds = flow.run_console()
-
-print(vars(creds))
+if 'CREDS' in os.environ:
+    cred_data = json.loads(os.environ['CREDS'])
+    creds = Credentials(
+        cred_data["token"],
+        refresh_token=cred_data["_refresh_token"],
+        token_uri=cred_data["_token_uri"],
+        client_id=cred_data["_client_id"],
+        client_secret=cred_data["_client_secret"]
+    )
+else:
+    flow = InstalledAppFlow.from_client_secrets_file(
+        CLIENT_SECRETS, scopes=SCOPES
+    )
+    creds = flow.run_console()
+    print("Pass this json back as an env var called CREDS")
+    print(json.dumps({k: v for k, v in vars(creds).items() if k != "expiry"}))
 
 service = build('sheets', 'v4', credentials=creds)
 
 # Call the Sheets API
-SPREADSHEET_ID = '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms'
-RANGE_NAME = 'Class Data!A2:E'
+RANGE_NAME = 'Prod!A1:P'
 result = service.spreadsheets().values().get(spreadsheetId=SPREADSHEET_ID,
                                              range=RANGE_NAME).execute()
 values = result.get('values', [])
 if not values:
     print('No data found.')
 else:
-    print('Name, Major:')
     for row in values:
         # Print columns A and E, which correspond to indices 0 and 4.
-        print('%s, %s' % (row[0], row[4]))
+        print(row)
