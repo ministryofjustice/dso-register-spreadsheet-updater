@@ -13,7 +13,7 @@ from google.oauth2.credentials import Credentials
 
 
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-CLIENT_SECRETS = 'creds.json'
+CLIENT_SECRETS = 'client_secret.json'
 SPREADSHEET_ID= '1rBtFtvJELDrPtkLyOPnYEaWuOzbB0BJDrpEcLTnPeQk'
 
 if 'CREDS' in os.environ:
@@ -35,14 +35,18 @@ else:
 
 service = build('sheets', 'v4', credentials=creds)
 
-# Call the Sheets API
-RANGE_NAME = 'Prod!A1:P'
-result = service.spreadsheets().values().get(spreadsheetId=SPREADSHEET_ID,
-                                             range=RANGE_NAME).execute()
-values = result.get('values', [])
-if not values:
-    print('No data found.')
-else:
-    for row in values:
-        # Print columns A and E, which correspond to indices 0 and 4.
-        print(row)
+values = [
+    ["A","B"],
+]
+
+RANGE_NAME = 'AutoProd!A1:P'
+result = service.spreadsheets().values().update(
+    spreadsheetId=SPREADSHEET_ID,
+    range=RANGE_NAME,
+    valueInputOption="USER_ENTERED",
+    body={"values": values}
+).execute()
+
+updatedCells = result.get('updatedCells', 0)
+
+print("Updated %d cells" % updatedCells)
