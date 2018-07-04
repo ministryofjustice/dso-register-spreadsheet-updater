@@ -8,9 +8,27 @@
 ## Setup
 
 ```
-pipenv
+pipenv install
 ```
 
+Download `client_secret.json` from Google apps...
+
+## Running
+
+```
+pipenv shell
+python main.py --help
+```
+
+Generate credentials file
+```
+python main.py creds
+```
+
+Populate spreadsheet
+```
+python main.py --subscription-id XXX --sheet-id XXX --sheet-name XXXX
+```
 
 # References
 
